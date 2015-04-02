@@ -5,4 +5,33 @@
 [![Dependency Status](https://david-dm.org/megawac/es-lookup-scope.svg)](https://david-dm.org/megawac/es-lookup-scope)
 [![devDependency Status](https://david-dm.org/megawac/es-lookup-scope/dev-status.svg)](https://david-dm.org/megawac/es-lookup-scope#info=devDependencies)
 
-Lookup the scope of a node in an AST
+Using [escope](https://github.com/estools/escope) we find the scope of any estree compatible AST node.
+
+```js
+import {parse} from 'acorn';
+import lookup from 'es-lookup-scope';
+import {traverse} from 'estraverse'
+
+let ast = parse(`
+      (function() {
+        const x = 2;
+        try {
+          const x = 1;
+          [1, 2, 3].map(x => x);
+        } catch(o_O) {}
+        console.log(x);
+      })();
+      module.exports = {
+        x() {
+          let y = this;
+          console.log(y);
+        }
+      }
+    `, { ecmaVersion: 6});
+    
+traverse(ast, {
+    enter(node) {
+        console.log(lookup(node));
+    }
+});
+```
